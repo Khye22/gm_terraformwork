@@ -3,19 +3,18 @@ provider "aws" {
 }
 
 resource "aws_instance" "clement" {
-  ami                    = "ami-04b4f1a9cf54c11d0"
-  instance_type          = "t2.micro"
-  key_name               = "jack"
+  ami           = "ami-04b4f1a9cf54c11d0"
+  instance_type = "t2.micro"
+  key_name      = "jack"
   //security_groups = ["clement-sg"]
   vpc_security_group_ids = [aws_security_group.clement-sg.id]
-  subnet_id = aws_subnet.jack-public_subent_01.id
-  
-}
+  subnet_id              = aws_subnet.jack-public-subnet-01.id
 
+}
 resource "aws_security_group" "clement-sg" {
   name        = "clement-sg"
   description = "clement-sg"
-  vpc_id = aws_vpc.jack_vpc.id
+  vpc_id      = aws_vpc.jack-vpc.id
 
 
   tags = {
@@ -51,67 +50,67 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_outbound_ipv6" {
   ip_protocol       = "-1" # semantically equivalent to all ports
 }
 
-resource "aws_vpc" "jack_vpc" {
-  cidr_block       = "10.0.0.0/16"
-  instance_tenancy = "default"
+resource "aws_vpc" "jack-vpc" {
+  cidr_block = "10.0.0.0/16"
+
 
   tags = {
-    Name = "jack_vpc"
+    Name = "jack-vpc"
   }
 }
 
-resource "aws_subnet" "jack_public-subnet-01" {
-    vpc_id = aws_vpc.jack_vpc.id
-    cidr_block = "10.1.1.0/24"
-    map_public_ip_on_launch = "true"
-    availability_zone = "us-east-1a"
+resource "aws_subnet" "jack-public-subnet-01" {
+  vpc_id                  = aws_vpc.jack-vpc.id
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = "true"
+  availability_zone       = "us-east-1a"
 
-    tags = {
-      Name = "jack_public-subnet-01"
-    }
-  
+  tags = {
+    Name = "jack-public-subnet-01"
+  }
+
 }
 
 
-resource "aws_subnet" "jack_public-subnet-02" {
-    vpc_id = aws_vpc.jack_vpc.id
-    cidr_block = "10.1.2.0/24"
-    map_public_ip_on_launch = "true"
-    availability_zone = "us-east-1b"
+resource "aws_subnet" "jack-public-subnet-02" {
+  vpc_id                  = aws_vpc.jack-vpc.id
+  cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = "true"
+  availability_zone       = "us-east-1b"
 
-    tags = {
-      Name = "jack_public-subnet-02"
-    }
-  
+  tags = {
+    Name = "jack-public-subnet-02"
+  }
+
 }
 
-resource "aws_internet_gateway" "jack-igw" { 
-    vpc_id = aws_vpc.jack_vpc.id
+resource "aws_internet_gateway" "jack-igw" {
+  vpc_id = aws_vpc.jack-vpc.id
 
-    tags = {
-      Name = "jack-igw"
-    }
-  
+  tags = {
+    Name = "jack-igw"
+  }
+
 }
 
-resource "aws_route_table" "jack_public-rt" {
-    vpc_id = aws_vpc.jack_vpc.id
-    route {
-        cidr_block = "0.0.0.0/0"
-        gateway_id = aws_internet_gateway.jack_igw.id
-    }
-    tags = {
-      Name = "jack_public-rt"
-    }
+resource "aws_route_table" "jack-public-rt" {
+  vpc_id = aws_vpc.jack-vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.jack-igw.id
+  }
+  tags = {
+    Name = "jack_public-rt"
+  }
 }
 
-resource "aws_route_table_association" "jack-rta-public-subent-01" {
-    subnet_id = aws_subnet.jack-public_subent_01.id
-    route_table_id = aws_route_table.jack-public-rt.id
+resource "aws_route_table_association" "jack-rta-public-subnet-01" {
+  subnet_id      = aws_subnet.jack-public-subnet-01.id
+  route_table_id = aws_route_table.jack-public-rt.id
 }
 
 
-resource "aws_route_table_association" "jack-rta-public-subent-02" {
-    subnet_id = aws_subnet.jack-public_subent_02.id
-    route_table_id = aws_route_table.jack-public-rt.id
+resource "aws_route_table_association" "jack-rta-public-subnet-02" {
+  subnet_id      = aws_subnet.jack-public-subnet-02.id
+  route_table_id = aws_route_table.jack-public-rt.id
 }
