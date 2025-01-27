@@ -9,7 +9,7 @@ resource "aws_instance" "clement" {
   //security_groups = ["clement-sg"]
   vpc_security_group_ids = [aws_security_group.clement-sg.id]
   subnet_id              = aws_subnet.jack-public-subnet-01.id
-for_each = toset (["sonarqube-master", "build-slave", "ansible"])
+for_each = toset (["sonarqube", "jenkins-slave", "ansible"])
    tags = {
      Name = "${each.key}"
   }
